@@ -15,7 +15,7 @@ FILENAME = 'strava.shp'
 f_id = 0
 f_date = 1
 f_type = 3
-f_path = 9
+f_path = 10 # Column in activities.csv that contains the file paths. Seems to move around.
 f_dist = 6
 
 
