@@ -22,11 +22,13 @@ f_dist = 6
 def un_gzip(infile):
     try:
         if infile.split('.')[-1] == 'gz':
+            infile.replace('/', os.path.sep)
             f = gzip.open(infile, 'rb')
             file_content = f.read()
         else:
-            file = open(infile, "rb")
-            file_content = file.read()
+            infile.replace('/', os.path.sep)
+            f = open(infile, "rb")
+            file_content = f.read()
         return file_content
     except(FileNotFoundError):
         print('File not found', infile)
@@ -40,9 +42,9 @@ ds = driver.CreateDataSource(FILENAME)
 srs = osr.SpatialReference()
 srs.ImportFromEPSG(4326)
 layer = ds.CreateLayer(FILENAME[:-4], srs, ogr.wkbLineString)
-fieldDefn_ = ogr.FieldDefn('aid', ogr.OFTInteger)
+fieldDefn_ = ogr.FieldDefn('aid', ogr.OFTInteger64)
 layer.CreateField(fieldDefn_)
-fieldDefn_ = ogr.FieldDefn('sid', ogr.OFTInteger)
+fieldDefn_ = ogr.FieldDefn('sid', ogr.OFTInteger64)
 layer.CreateField(fieldDefn_)
 fieldDefn_ = ogr.FieldDefn('atime', ogr.OFTString)
 layer.CreateField(fieldDefn_)
@@ -114,9 +116,9 @@ with open('activities.csv') as csv_file:
             feature.SetField('aid', aid)
             feature.SetField('atime', row[f_date])
             feature.SetField('atype', row[f_type])
-            feature.SetField('adist', float(row[f_dist]))
-            if row[f_id] != '1350056089':
-                layer.CreateFeature(feature)
+            feature.SetField('adist', float(str(row[f_dist]).replace(',', '')))
+            #if row[f_id] != '1350056089':
+            layer.CreateFeature(feature)
 
     aid += 1
 
