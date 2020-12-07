@@ -15,7 +15,7 @@ FILENAME = 'strava.shp'
 f_id = 0
 f_date = 1
 f_type = 3
-f_path = 10 # Column in activities.csv that contains the file paths. Seems to move around.
+f_path = 10  # Column in activities.csv that contains the file paths. Seems to move around.
 f_dist = 6
 
 
@@ -63,21 +63,22 @@ with open('activities.csv') as csv_file:
         line = ogr.Geometry(ogr.wkbLineString)
         file_type = None
         root = None
-        
-        if row[f_path].split('.')[-1] in ('gz', 'zip'):
-            file_type = row[f_path].split('.')[-2]
-        else:
-            file_type = row[f_path].split('.')[-1]
-        if file_type in ('tcx', 'gpx'):
-            print(row[f_path])
-            file = un_gzip(row[f_path]).strip()
-            if file:
-                root = ET.fromstring(file)
-        if file_type in('fit'):
-            print(row[f_path])
-            file = un_gzip(row[f_path])
-            if file:
-                root = fitparse.FitFile(file)
+
+        if row[f_path] is not None and len(row[f_path]) > 0:
+            if row[f_path].split('.')[-1] in ('gz', 'zip'):
+                file_type = row[f_path].split('.')[-2]
+            else:
+                file_type = row[f_path].split('.')[-1]
+            if file_type in ('tcx', 'gpx'):
+                print(row[f_path])
+                file = un_gzip(row[f_path]).strip()
+                if file:
+                    root = ET.fromstring(file)
+            if file_type in ('fit'):
+                print(row[f_path])
+                file = un_gzip(row[f_path])
+                if file:
+                    root = fitparse.FitFile(file)
 
         if root:
 
@@ -86,13 +87,14 @@ with open('activities.csv') as csv_file:
                     for segs in trks.findall("{http://www.topografix.com/GPX/1/1}trkseg"):
                         pts = list(segs)
                         for p in pts:
-                            line.AddPoint( float(p.attrib['lon']), float(p.attrib['lat']))
+                            line.AddPoint(float(p.attrib['lon']), float(p.attrib['lat']))
             elif file_type == 'tcx':
                 for acts in root.findall("{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Activities"):
                     for act in acts.findall("{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Activity"):
                         for lps in act.findall("{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Lap"):
                             for trk in lps.findall("{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Track"):
-                                for trkp in trk.findall("{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint"):
+                                for trkp in trk.findall(
+                                        "{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint"):
                                     for pos in trkp.findall(
                                             "{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Position"):
                                         for lat in pos.findall(
@@ -103,9 +105,9 @@ with open('activities.csv') as csv_file:
                                             loni = lon.text
                                         line.AddPoint(float(loni), float(lati))
             elif file_type == 'fit':
-                #print(root)
+                # print(root)
                 for r in root.get_messages('record'):
-                    if r.get('position_lat') is not None:
+                    if r.get_value('position_lat') is not None:
                         lat = int(r.get_value('position_lat')) * (180 / 2 ** 31)
                         lon = int(r.get_value('position_long')) * (180 / 2 ** 31)
                         line.AddPoint(lon, lat)
@@ -118,9 +120,10 @@ with open('activities.csv') as csv_file:
             feature.SetField('atime', row[f_date])
             feature.SetField('atype', row[f_type])
             feature.SetField('adist', float(str(row[f_dist]).replace(',', '')))
-            #if row[f_id] != '1350056089':
+            # if row[f_id] != '1350056089':
             layer.CreateFeature(feature)
 
     aid += 1
 
     print("Done")
+    
