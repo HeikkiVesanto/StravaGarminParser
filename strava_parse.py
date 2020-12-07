@@ -108,9 +108,10 @@ with open('activities.csv') as csv_file:
                 # print(root)
                 for r in root.get_messages('record'):
                     if r.get_value('position_lat') is not None:
-                        lat = int(r.get_value('position_lat')) * (180 / 2 ** 31)
-                        lon = int(r.get_value('position_long')) * (180 / 2 ** 31)
-                        line.AddPoint(lon, lat)
+                        lat = int(r.get_value('position_lat')) * (180.0 / 2 ** 31)
+                        lon = int(r.get_value('position_long')) * (180.0 / 2 ** 31)
+                        if lat != 0 and lon != 0:
+                            line.AddPoint(lon, lat)
 
             feature = ogr.Feature(layer.GetLayerDefn())
             feature.SetGeometry(line)
@@ -126,4 +127,3 @@ with open('activities.csv') as csv_file:
     aid += 1
 
     print("Done")
-    
