@@ -62,7 +62,8 @@ with open('activities.csv') as csv_file:
     for row in csv_reader:
         line = ogr.Geometry(ogr.wkbLineString)
         file_type = None
-
+        root = None
+        
         if row[f_path].split('.')[-1] in ('gz', 'zip'):
             file_type = row[f_path].split('.')[-2]
         else:
