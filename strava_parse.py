@@ -3,20 +3,30 @@ import gzip
 import fitparse
 import json
 import xml.etree.ElementTree as ET
-import ogr, sys, os
+import osgeo.ogr as ogr
+import sys, os
 import osgeo.osr as osr
 
 # Usage: Put into the same folder as your unzipped stava data. Only works on Garmin file types, GPX, FIT, and TCX.
 # Has requirements.
 
-FILENAME = 'strava.shp'
+FILENAME = 'strava'  # extension gets added.
 
 # Column id's
-f_id = 0
-f_date = 1
-f_type = 3
-f_path = 10  # Column in activities.csv that contains the file paths. Seems to move around.
-f_dist = 6
+# f_id = 0
+# f_date = 1
+# f_type = 3
+# f_path = 11  # Column in activities.csv that contains the file paths. Seems to move around.
+# f_dist = 6
+
+# Column names in activities.csv
+f_id = 'Activity ID'
+f_date = 'Activity Date'
+f_type = 'Activity Type' 
+f_path = 'Filename'
+f_dist = 'Distance'
+
+#parse to line or point:
 
 
 def un_gzip(infile):
@@ -34,6 +44,15 @@ def un_gzip(infile):
         print('File not found', infile)
         return None
 
+
+def notNone(s,d):
+    if s is None:
+        return d
+    else:
+        return s
+
+
+FILENAME = FILENAME + '.shp'
 
 # Shapefile creation
 print('Creating file', FILENAME)
@@ -57,7 +76,8 @@ print('Created file', FILENAME)
 aid = 0
 
 with open('activities.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
+    csv_reader = csv.DictReader(csv_file, delimiter=',')
+    headers = csv_reader.fieldnames
     next(csv_reader)
     for row in csv_reader:
         line = ogr.Geometry(ogr.wkbLineString)
@@ -120,7 +140,7 @@ with open('activities.csv') as csv_file:
             feature.SetField('aid', aid)
             feature.SetField('atime', row[f_date])
             feature.SetField('atype', row[f_type])
-            feature.SetField('adist', float(str(row[f_dist]).replace(',', '')))
+            feature.SetField('adist', float(str(notNone(row[f_dist], 0)).replace(',', '')))
             # if row[f_id] != '1350056089':
             layer.CreateFeature(feature)
 
