@@ -9,3 +9,5 @@ Like:
 fitparse
 ogr
 osr
+
+Also has a parse to points script, which loads directly to a PostgreSQL/PostGIS database.
