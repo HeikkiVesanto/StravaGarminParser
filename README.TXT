@@ -11,3 +11,4 @@ ogr
 osr
 
 Also has a parse to points script, which loads directly to a PostgreSQL/PostGIS database.
+Further processing the points: https://gist.github.com/HeikkiVesanto/3fbd55cda45394d069773a34ea244e4b
