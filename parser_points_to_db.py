@@ -1,11 +1,8 @@
 import csv
 import gzip
 import fitparse
-import json
 import xml.etree.ElementTree as ET
-import osgeo.ogr as ogr
-import sys, os
-import osgeo.osr as osr
+import os
 import psycopg2
 from psycopg2 import sql
 
@@ -19,7 +16,7 @@ CONNECTION = psycopg2.connect(user="postgres",
                               database="postgis")
 
 SCHEMA = 'strava'  # this should exist
-TABLE = 'strava_pts'
+TABLE = 'strava_pts2'
 
 # Column names in activities.csv
 f_id = 'Activity ID'
